@@ -90,4 +90,5 @@ bool Module::insert(std::string id, std::string cmp, double value)
 	if(colIdx >= recs.data[0].size())
 		return false;
 	recs.data[rowIdx][colIdx] = value;
+	return true;
 }

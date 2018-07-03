@@ -18,10 +18,10 @@
 void enter(Module& module, std::string& prompt)
   {  
 	std::string cmp;     
-       std::cout<< "Which component: " << module.getEditableList() << std::endl << prompt;
+       std::cout<< "Which component: " << module.getEditableList() << std::endl;
        getline(std::cin, cmp);
        while(!module.isComponent(cmp) || !module.isEditable(cmp)){
-		std::cout<< "Not an editable component, enter again: " << module.getEditableList() << std::endl << prompt;
+		std::cout<< "Not an editable component, enter again: " << module.getEditableList() << std::endl;
        		getline(std::cin, cmp);
 	}
       
@@ -29,23 +29,23 @@ void enter(Module& module, std::string& prompt)
          {
             std::string ID;
             double value;
-            std::cout << "Enter ID: " << std::endl << prompt;
+            std::cout << "Enter ID: ";
             getline(std::cin, ID);
 	    if(ID == "back") break;
 	    while(!module.isStudent(ID)){
-		std::cout << "ID does not exist, try again: " << std::endl << prompt;
+		std::cout << "ID does not exist, try again: ";
             	getline(std::cin, ID);
 	    }
             
-            std::cout << "Enter Mark: " << std::endl << prompt;
+            std::cout << "Enter Mark: ";
             std::cin >> value; 
             std::cin.ignore(10,'\n');
 	    while(value > 100 || value < 0){
-		std::cout << "Should be between 0 and 100, again: " << std::endl << prompt;
+		std::cout << "Should be between 0 and 100, again: ";
             	std::cin >> value; 
             	std::cin.ignore(10,'\n');
 		}
-	    std::cout << (module.insert(ID,cmp,value)? "Successful":"WTF") << std::endl;
+	    std::cout << (module.insert(ID,cmp,value)? "\t\t\t\tEntry Successful":"\t\t\t\tUh-oh...") << std::endl;
          }
       module.update();
   }
@@ -53,23 +53,63 @@ void enter(Module& module, std::string& prompt)
   void lookup(Module module, std::string& prompt)
   {
        std::string cmp;
-       std::cout<<"Enter Component(s), separated by spaces: " << module.getComponentList() << " ALL" << std::endl << prompt;
+       std::cout<<"Enter Component(s), separated by spaces " << std::endl << module.getComponentList() << " ALL" << std::endl;
        getline(std::cin, cmp);
        if(cmp == "ALL") cmp = module.getComponentList();
        
        std::vector<std::string> line;
-       boost::trim(line);
+       boost::trim(cmp);
        boost::split(line, cmp, boost::is_any_of(" "));
        
         for(;;)
           {
              std::string ID;
-             std::cout<<"Enter ID: " << std::endl << prompt;
+             std::cout<<"Enter ID (or ALL): ";
              getline(std::cin, ID);
-             if(ID == "back") break;
-             
+	     if(ID == "back") break;
+	     
+
+	     if(ID == "ALL")
+		{
+			std::cout << "\t\t";
+			for(int j=0; j<line.size(); ++j){
+				if(!module.isComponent(line[j])) continue;
+					std::cout << '\t' << line [j];
+			}
+			std::cout << std::endl;
+
+			for(size_t i=0; i<module.rowCount(); ++i)
+			{
+				std::cout << module.getName(i) << ": " ;
+				size_t tabs = 3;
+				tabs -= (module.maxKeyLength()+2)/8;
+				std::cout << std::string(tabs,'\t');
+				for(int j=0; j<line.size(); ++j)
+				     {
+					if(!module.isComponent(line[j])) continue;
+					std::cout << module.get(i,line[j]) << (j<(line.size()-1)?"\t":"");
+				     }
+				     std::cout << std::endl;
+			}
+			continue;
+		}
+	     while(!module.isStudent(ID)){
+		std::cout << "ID does not exist, try again: ";
+            	getline(std::cin, ID);
+	     }
+
+		for(int j=0; j<line.size(); ++j){
+			if(!module.isComponent(line[j])) continue;
+				std::cout << '\t' << line [j];
+		}
+		std::cout << std::endl;
+                  
              for(int i=0; i<line.size(); ++i)
-                std::cout << module.get(ID,line[i]) << (i<(line.size()-1)?", ":"");
+	     {
+		
+		if(!module.isComponent(line[i])) continue;
+                std::cout << '\t' << module.get(ID,line[i]);
+	     }
              std::cout << std::endl;
           }
     }
@@ -98,8 +138,6 @@ void recursiveComponentEntry(Module& l, std::string& name, std::string& prompt)
 
   void create(std::vector<Module>& modules, std::string& prompt)
   {
-      std::string title = "create";
-      prompt.append(title);
       std::string name;
       std::cout << "Enter Module Descriptor: ";
       std::cin >> name;
@@ -108,7 +146,6 @@ void recursiveComponentEntry(Module& l, std::string& name, std::string& prompt)
       prompt.append(name);
       recursiveComponentEntry(modules[m], name, prompt);
       std::cin.ignore (1000, '\n');
-      prompt.resize(prompt.size()-title.size()-name.size());
     
       //name.append(".csv"); swap with this when mod csvs set up - or do file search thingy (boost)
       name = "test.csv";
@@ -132,7 +169,7 @@ void manage( std::vector<Module>& modules, std::string prompt)
      for(;;)
 	{
 	     size_t choice;
-	     std::cout << "Managing module " << code << std::endl << "Enter results (1), view (2) or go back (3): ";
+	     std::cout << "\033[2J" << "Managing module " << code << std::endl << "Enter results (1), view (2) or go back (3): ";
 	     std::cin >> choice;
 	     std::cin.ignore(10,'\n');
 	     switch(choice)
@@ -151,10 +188,12 @@ int main()
        
        for(int choice=0;choice != 3; )
          {
+	    std::cout << "\033[2J";
             std::cout << "Manage a module (1), Create a module (2) or quit (3): " << std::endl;//template iostream
    
             std::cin >> choice;
             std::cin.ignore(100,'\n');
+	    
             switch(choice)
               {
                 case 1: manage(modules, prompt);break;

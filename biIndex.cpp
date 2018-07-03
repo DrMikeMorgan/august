@@ -7,6 +7,8 @@ bool biIndex::insert(std::string s, size_t i)
   {
     if(i > reverse.size())
       return false;
+    if(s.size() > longest_key)
+	longest_key = s.size();
     forward[s]=i; 
     if(i == reverse.size()) 
        reverse.push_back(s); 

@@ -10,19 +10,23 @@ class biIndex
   friend class boost::serialization::access;
    std::map<std::string, size_t> forward;
    std::vector<std::string> reverse;
+   size_t longest_key;
    template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
       ar & forward;
       ar & reverse;
+      ar & longest_key;
   }
 public:
-   biIndex(){}
+   biIndex():longest_key(0){}
    bool insert(std::string s, size_t i);
    bool remove(std::string s, size_t i){forward.erase(s); reverse[i]="";} // TODO swapper - take out i in vector by swapping with back, then rewrite forward[reverse[i]] = forward[reverse[back]], erase back;
    std::string& get(size_t i){return reverse[i];}
    size_t get(std::string s);
    bool testInvariant() {for(int i=0; i<reverse.size(); ++i) if(forward[reverse[i]] != i) return false; return true;}   
+   size_t size(){return reverse.size();}
+   size_t maxKeyLength(){return longest_key;}
 };
 
 #endif

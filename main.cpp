@@ -32,8 +32,8 @@ void enter(Module& module, std::string& prompt)
             std::cout << "Enter ID: ";
             getline(std::cin, ID);
 	    if(ID == "back") break;
-	    while(!module.isStudent(ID)){
-		std::cout << "ID does not exist, try again: ";
+	    while(module.checkID(ID) > 0){
+		std::cout << "ID is duplicate or does not exist, try again: ";
             	getline(std::cin, ID);
 	    }
             
@@ -93,8 +93,8 @@ void enter(Module& module, std::string& prompt)
 			}
 			continue;
 		}
-	     while(!module.isStudent(ID)){
-		std::cout << "ID does not exist, try again: ";
+	     while(module.checkID(ID) > 0){
+		std::cout << "ID is duplicate or does not exist, try again: ";
             	getline(std::cin, ID);
 	     }
 

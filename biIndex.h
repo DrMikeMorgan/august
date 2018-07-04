@@ -4,12 +4,14 @@
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/vector.hpp>
 #include <string>
+#include <set>
 
 class biIndex
 {
   friend class boost::serialization::access;
    std::map<std::string, size_t> forward;
    std::vector<std::string> reverse;
+   std::set<std::string> duplicates;
    size_t longest_key;
    template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
@@ -27,6 +29,8 @@ public:
    bool testInvariant() {for(int i=0; i<reverse.size(); ++i) if(forward[reverse[i]] != i) return false; return true;}   
    size_t size(){return reverse.size();}
    size_t maxKeyLength(){return longest_key;}
+   bool contains(std::string s){return forward.find(s) != forward.end();}
+   bool isDuplicate(std::string key) {return duplicates.find(key) != duplicates.end();} 
 };
 
 #endif

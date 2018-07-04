@@ -30,7 +30,7 @@ void Module::init(std::string name)
     cols.insert(name,recs.addCol());
     rgxs.push_back(boost::regex("J[0-9]{5}"));
     rgxs.push_back(boost::regex("[0-9]{7}"));
-    rgxs.push_back(boost::regex("[A-Z][a-z]+ [A-Z][a-z]+"));//these should stay hard coded - no serialization
+    rgxs.push_back(boost::regex("[A-Z]+ [A-Z]+"));//these should stay hard coded - no serialization
   }
   bool Module::addSubcomponent(std::string parent, std::string name, double weight)
   {
@@ -48,15 +48,13 @@ void Module::init(std::string name)
               std::string input;
               std::vector<std::string> line;
               getline(in, input);
+	      boost::erase_all(input, "'");
               boost::split(line, input, boost::is_any_of(","));
               if(line.size()!=rgxs.size()) break;
               this->addRecord(line[0]);
               
               for(size_t i=1; i<line.size(); ++i)
-                   this->associateRecordID(line[0],line[i]);
-              
-              //std::cout << line[2] << std::endl;
-              
+                   this->associateRecordID(line[0],line[i]);              
          }
        in.close();
   }
@@ -67,15 +65,17 @@ void Module::init(std::string name)
       cmps.update(recs.data[i]);
   }
 
-bool Module::isStudent(std::string s)
+std::size_t Module::checkID(std::string s)
 {
 	size_t map = getMap(s);
 	if(map >= rgxs.size())
-		return false;
+		return 1;
 	size_t rowIdx = rows[map].get(s);
 	if(rowIdx >= recs.data.size())
-		return false;
-	return true;
+		return 2;
+	if(rows[map].isDuplicate(s))
+		return 3;
+	return 0;
 }
 
 bool Module::insert(std::string id, std::string cmp, double value)

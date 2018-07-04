@@ -33,7 +33,7 @@ class Module
   Module(std::string name):cmps(name,0.0,0),name_(name){init(name);}//at least 3 IDs J name stu num 
   void init(std::string);
   void addID(boost::regex rgx){rgxs.push_back(rgx); rows.resize(rows.size()+1);}
-  void associateRecordID(std::string existingID, std::string newID){rows[getMap(newID)].insert(newID, rows[getMap(existingID)].get(existingID));}
+  void associateRecordID(std::string existingID, std::string newID){rows[getMap(newID)].insert(newID, rows[getMap(existingID)].get(existingID));} // exception framework 
   bool addRecord(std::string s){rows[this->getMap(s)].insert(s, recs.addRow());}
   bool addSubcomponent(std::string parent, std::string name, double weight);
   bool insert(std::string id, std::string cmp, double value);
@@ -44,7 +44,7 @@ class Module
   std::string getComponentList();
   std::string getName(){return name_;}
   bool isComponent(std::string s){return cols.get(s) < std::numeric_limits<size_t>::max();}
-  bool isStudent(std::string s);
+  size_t checkID(std::string s);
   std::string getEditableList();
   bool isEditable(std::string s){return cmps.isEditable(s);}
   std::string getName(size_t ID, std::string example = "J00000"){return rows[getMap(example)].get(ID);}
